@@ -12,6 +12,7 @@ const Movie = database.define("movie", {
   },
   synopsis: {
     type: Sequelize.STRING,
+    allowNull: true,
   }
 })
 
