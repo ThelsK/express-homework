@@ -3,8 +3,29 @@ const middleware = require("./middleware")
 const Movie = require("./model")
 
 router.get("/movies", (req, res, next) => {
-  Movie.findAll()
-    .then(movies => res.send(movies))
+
+  if (req.query.offset && !parseInt(req.query.offset)) {
+    res.status(400).send({
+      message: "The offset parameter must be ommitted or an integer"
+    })
+    return
+  }
+
+  if (req.query.limit && !parseInt(req.query.limit)) {
+    res.status(400).send({
+      message: "The limit parameter must be ommitted or an integer"
+    })
+    return
+  }
+
+  Movie.findAndCountAll({
+    offset: parseInt(req.query.offset) || null,
+    limit: parseInt(req.query.limit) || null,
+  })
+    .then(movies => res.send({
+      data: movies.rows,
+      total: movies.count,
+    }))
     .catch(next)
 })
 
@@ -45,7 +66,10 @@ router.delete("/movies/:id", (req, res, next) => {
       if (amount) {
         res.send({ moviesDeleted: amount })
       } else {
-        res.status(404).send({ message: "No movie with that id" })
+        res.status(404).send({
+          message: "No movie with that id",
+          moviesDeleted: amount,
+        })
       }
     })
     .catch(next)
