@@ -1,5 +1,5 @@
 const router = new require("express").Router()
-const middleware = require("./messages-middleware")
+const middleware = require("./middleware")
 
 router.post("/messages", middleware, (req, res, next) => {
   console.log("Received:", req.body.text)
